@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'ostruct'
+
+class OptionsParser
+  def self.parse(args)
+    options = OpenStruct.new
+    options.google_website = "google.com.br"
+    options.max_links = 100
+
+    opt_parser = OptionParser.new do |opts|
+      opts.banner = "Usage: email-crawler [options]"
+      opts.separator ""
+
+      opts.on("-q", '--query "SEARCH TERM/EXPRESSION"',
+              "The term/expression you want to search for") do |q|
+        options.q = q
+      end
+
+      opts.on("-g", "--google-website google.com.au",
+              "An alternative Google website",
+              "  (defaults to Google Brazil)") do |google_website|
+        options.google_website = google_website
+      end
+
+      opts.on("-m", "--max-links 250",
+              "Max # of internal links to visit searching for emails",
+              "  (per search result, defaults to 100)") do |max_links|
+        options.max_links = max_links.to_i
+      end
+    end
+
+    opt_parser.parse!(args)
+    options
+  end
+end
+
+options = OptionsParser.parse(ARGV)
+if options.q.empty?
+  print "The -q switch is mandatory\n"
+  exit(1)
+else
+  require_relative "../lib/email_crawler"
+  csv = EmailCrawler::Runner.new(options.google_website).run(options.q, options.max_links)
+  $stdout << "#{csv}\n"
+end
