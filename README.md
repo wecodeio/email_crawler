@@ -4,17 +4,9 @@ Email crawler: crawls the top ten Google search results looking for email addres
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'email_crawler'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
     $ gem install email_crawler
+    $ cp .env.example .env
+    # set your Digital Ocean credentials (@see lib/email_crawler/proxy.rb for more details)
 
 ## Usage
 
