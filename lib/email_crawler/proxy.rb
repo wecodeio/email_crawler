@@ -15,7 +15,8 @@ module EmailCrawler
         @all ||= begin
           Dotenv.load
 
-          json = JSON.parse(open("https://api.digitalocean.com/droplets/?client_id=#{ENV['DO_CLIENT_ID']}&api_key=#{ENV['DO_API_KEY']}").read)
+          json = JSON.parse(open("https://api.digitalocean.com/droplets/?client_id=#{ENV['DO_CLIENT_ID']}&api_key=#{ENV['DO_API_KEY']}",
+                                 ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE).read)
           json["droplets"].
             select{ |droplet| droplet["name"] =~ /proxy\d+/ }.
             map { |droplet| droplet["ip_address"] }
