@@ -21,8 +21,8 @@ module EmailCrawler
       end
     end
 
-    def run(q, max_links = PageLinks::MAX_LINKS)
-      urls = Scraper.new(@google_website).top_ten_urls_for(q)
+    def run(q, max_results = Scraper::MAX_RESULTS, max_links = PageLinks::MAX_LINKS)
+      urls = Scraper.new(@google_website, max_results).search_result_urls_for(q)
       urls.each { |url, links| @logger.info "#{url}" }
 
       threads = (1..urls.length).map do |i|

@@ -19,25 +19,31 @@ email-crawler --help
 2. Simplest Google search
 
 ```bash
-email-crawler -q "berlin walks"
+email-crawler --query "berlin walks"
 ```
 
 3. Select which Google website to use (defaults to google.com.br)
 
 ```bash
-email-crawler -q "berlin walks" -g google.de
+email-crawler --query "berlin walks" --google-website google.de
 ```
 
-4. Specify how many internal links are to be scanned for email addresses (defaults to 100)
+4. Specify how many search results URLs to collect (defaults to 100)
 
 ```bash
-email-crawler -q "berlin walks" -g google.de -m 250
+email-crawler --query "berlin walks" --max-results 250
 ```
 
-5. Redirect output to a file
+5. Specify how many internal links are to be scanned for email addresses (defaults to 100)
 
 ```bash
-email-crawler -q "berlin walks" -g google.de -m 250 > ~/Desktop/belin-walks-emails.csv
+email-crawler --query "berlin walks" --max-links 250
+```
+
+6. Redirect output to a file
+
+```bash
+email-crawler --query "berlin walks" > ~/Desktop/belin-walks-emails.csv
 ```
 
 ## Contributing

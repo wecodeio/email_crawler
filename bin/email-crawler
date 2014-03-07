@@ -3,11 +3,14 @@
 require 'optparse'
 require 'ostruct'
 
+require_relative "../lib/email_crawler"
+
 class OptionsParser
   def self.parse(args)
     options = OpenStruct.new
     options.google_website = "google.com.br"
-    options.max_links = 100
+    options.max_results = ::EmailCrawler::Scraper::MAX_RESULTS
+    options.max_links = ::EmailCrawler::PageLinks::MAX_LINKS
 
     opt_parser = OptionParser.new do |opts|
       opts.banner = "Usage: email-crawler [options]"
@@ -24,7 +27,13 @@ class OptionsParser
         options.google_website = google_website
       end
 
-      opts.on("-m", "--max-links 250",
+      opts.on("-r", "--max-results 250",
+              "Max # of search result URLs to collect before crawling each one for email addresses",
+              "  (defaults to 100)") do |max_results|
+        options.max_results = max_results.to_i
+      end
+
+      opts.on("-l", "--max-links 250",
               "Max # of internal links to visit searching for emails",
               "  (per search result, defaults to 100)") do |max_links|
         options.max_links = max_links.to_i
@@ -41,7 +50,8 @@ if options.q.empty?
   print "The -q switch is mandatory\n"
   exit(1)
 else
-  require_relative "../lib/email_crawler"
-  csv = EmailCrawler::Runner.new(options.google_website).run(options.q, options.max_links)
+  csv = EmailCrawler::Runner.new(options.google_website).run(options.q,
+                                                             options.max_results,
+                                                             options.max_links)
   $stdout << "#{csv}\n"
 end
