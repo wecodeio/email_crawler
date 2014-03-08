@@ -2,6 +2,7 @@ module EmailCrawler
   class PageLinks
     MAX_LINKS  = 100
     SLEEP_TIME = 0.5
+    MAX_RETRIES = 5
 
     include MechanizeHelper
 
@@ -25,11 +26,32 @@ module EmailCrawler
 
     def fetch_links(max_links = MAX_LINKS)
       queue, links = Set.new([@url]), Set.new([@url])
+      retries = 0
 
       until queue.empty?
         current_link = queue.first
         @logger.info "current_link: #{current_link}"
-        page = get(current_link)
+
+        begin
+          page = get(current_link)
+        rescue Net::HTTP::Persistent::Error => err
+          @logger.warn err.inspect
+          page = nil
+
+          if retries < MAX_RETRIES
+            retries += 1
+            @logger.debug "Retry ##{retries}"
+            agent.shutdown
+            Thread.current[:agent] = nil
+            sleep(SLEEP_TIME)
+            retry
+          else
+            @logger.error "Giving up grabbing link for '#{@url}' after #{retries} retries"
+            break
+          end
+        else
+          retries = 0
+        end
 
         if page
           new_links = page.links_with(href: @domain).map(&:href)

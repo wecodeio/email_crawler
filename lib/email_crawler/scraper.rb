@@ -40,7 +40,8 @@ module EmailCrawler
     end
 
     def agent
-      @agent ||= new_agent { |agent| agent.set_proxy(Proxy.random, "8888") }
+      @agent ||= new_agent
+      # @agent ||= new_agent { |agent| agent.set_proxy(Proxy.random, "8888") }
     end
   end
 end

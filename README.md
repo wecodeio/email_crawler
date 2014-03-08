@@ -10,37 +10,43 @@ Email crawler: crawls the top ten Google search results looking for email addres
 
 ## Usage
 
-1. Ask for help
+* Ask for help
 
 ```bash
 email-crawler --help
 ```
 
-2. Simplest Google search
+* Simplest Google search
 
 ```bash
 email-crawler --query "berlin walks"
 ```
 
-3. Select which Google website to use (defaults to google.com.br)
+* Select which Google website to use (defaults to google.com.br)
 
 ```bash
 email-crawler --query "berlin walks" --google-website google.de
 ```
 
-4. Specify how many search results URLs to collect (defaults to 100)
+* Specify how many search results URLs to collect (defaults to 100)
 
 ```bash
 email-crawler --query "berlin walks" --max-results 250
 ```
 
-5. Specify how many internal links are to be scanned for email addresses (defaults to 100)
+* Specify how many internal links are to be scanned for email addresses (defaults to 100)
 
 ```bash
 email-crawler --query "berlin walks" --max-links 250
 ```
 
-6. Redirect output to a file
+* Specify how many threads to use when searching for links and email addresses (defaults to 10)
+
+```bash
+email-crawler --query "berlin walks" --concurrency 25
+```
+
+* Redirect output to a file
 
 ```bash
 email-crawler --query "berlin walks" > ~/Desktop/belin-walks-emails.csv

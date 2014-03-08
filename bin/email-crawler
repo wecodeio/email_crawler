@@ -11,6 +11,7 @@ class OptionsParser
     options.google_website = "google.com.br"
     options.max_results = ::EmailCrawler::Scraper::MAX_RESULTS
     options.max_links = ::EmailCrawler::PageLinks::MAX_LINKS
+    options.max_concurrency = ::EmailCrawler::Runner::MAX_CONCURRENCY
 
     opt_parser = OptionParser.new do |opts|
       opts.banner = "Usage: email-crawler [options]"
@@ -38,6 +39,12 @@ class OptionsParser
               "  (per search result, defaults to 100)") do |max_links|
         options.max_links = max_links.to_i
       end
+
+      opts.on("-c", "--concurrency 25",
+              "Max # of threads to use to look for links and email addresses",
+              "  (defaults to 10)") do |max_concurrency|
+        options.max_concurrency = max_concurrency.to_i
+      end
     end
 
     opt_parser.parse!(args)
@@ -50,8 +57,11 @@ if options.q.empty?
   print "The -q switch is mandatory\n"
   exit(1)
 else
-  csv = EmailCrawler::Runner.new(options.google_website).run(options.q,
-                                                             options.max_results,
-                                                             options.max_links)
+  runner = EmailCrawler::Runner.new(options.google_website) do |runner|
+    runner.max_results = options.max_results
+    runner.max_links = options.max_links
+    runner.max_concurrency = options.max_concurrency
+  end
+  csv = runner.run(options.q)
   $stdout << "#{csv}\n"
 end
