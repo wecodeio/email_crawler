@@ -49,6 +49,8 @@ module EmailCrawler
             @logger.error "Giving up grabbing link for '#{@url}' after #{retries} retries"
             break
           end
+        rescue URI::InvalidComponentError => err
+          @logger.warn err.inspect
         else
           retries = 0
         end
