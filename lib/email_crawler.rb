@@ -12,7 +12,7 @@ require_relative "email_crawler/email_scanner"
 
 module EmailCrawler
   class Runner
-    MAX_CONCURRENCY = 10
+    MAX_CONCURRENCY = 50
 
     attr_writer :max_results, :max_links, :max_concurrency
 
@@ -62,7 +62,7 @@ module EmailCrawler
 
       links_by_url.each { |arr| queue.push(arr) }
       emails_by_url = ThreadSafe::Hash.new
-      threads = (1..[links_by_url.length, MAX_CONCURRENCY].min).map do |i|
+      threads = (1..[links_by_url.length, @max_concurrency].min).map do |i|
         Thread.new(i) do |i|
           arr = begin
                   queue.pop(true)

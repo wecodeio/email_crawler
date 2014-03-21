@@ -40,7 +40,7 @@ email-crawler --query "berlin walks" --max-results 250
 email-crawler --query "berlin walks" --max-links 250
 ```
 
-* Specify how many threads to use when searching for links and email addresses (defaults to 10)
+* Specify how many threads to use when searching for links and email addresses (defaults to 50)
 
 ```bash
 email-crawler --query "berlin walks" --concurrency 25
