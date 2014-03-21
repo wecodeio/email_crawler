@@ -13,10 +13,18 @@ module EmailCrawler
     end
 
     def get(url)
+      retried = false
+
       begin
         page = agent.get(url)
         page if page.is_a?(Mechanize::Page)
-      rescue Mechanize::Error, Net::OpenTimeout; end
+      rescue Mechanize::Error;
+      rescue SocketError, Net::OpenTimeout
+        unless retried
+          retried = true
+          retry
+        end
+      end
     end
   end
 end
