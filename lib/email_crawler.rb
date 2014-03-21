@@ -22,7 +22,7 @@ module EmailCrawler
     end
 
     def run(q)
-      urls = Scraper.new(@google_website, @max_results).search_result_urls_for(q)
+      urls = Scraper.new(@google_website, max_results: @max_results).search_result_urls_for(q)
       urls.each { |url| logger.info "#{url}" }
       queue = Queue.new
       urls.each { |url| queue.push(url) }

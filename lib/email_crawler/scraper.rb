@@ -1,14 +1,16 @@
-require_relative "proxy"
+require_relative "url_helper"
 
 module EmailCrawler
   class Scraper
     MAX_RESULTS = 100
 
     include MechanizeHelper
+    include URLHelper
 
-    def initialize(google_website, max_results = MAX_RESULTS)
+    def initialize(google_website, max_results: MAX_RESULTS, blacklisted_domains: [])
       @google_website = "https://www.#{google_website}/"
       @max_results = max_results
+      @blacklisted_domains = blacklisted_domains.map { |domain| /#{domain}\z/ }
     end
 
     def search_result_urls_for(q)
@@ -36,12 +38,15 @@ module EmailCrawler
     def search_results_on(page)
       page.search("#search ol li h3.r a").
         map { |a| a["href"].downcase }.
-        reject { |url| url =~ %r(\A/search[?]q=) }
+        reject { |url| url =~ %r(\A/search[?]q=) }.
+        reject do |url|
+          domain = extract_domain_from(url)
+          @blacklisted_domains.any? { |blacklisted_domain| domain =~ blacklisted_domain }
+        end
     end
 
     def agent
       @agent ||= new_agent
-      # @agent ||= new_agent { |agent| agent.set_proxy(Proxy.random, "8888") }
     end
   end
 end
