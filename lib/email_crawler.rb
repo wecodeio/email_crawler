@@ -14,28 +14,16 @@ module EmailCrawler
   class Runner
     MAX_CONCURRENCY = 50
 
-    attr_writer :max_results, :max_links, :max_concurrency
+    attr_writer :max_results, :max_links, :max_concurrency, :logger
 
     def initialize(google_website)
       @google_website = google_website
-
-      # @logger = ::Logger.new(STDOUT).tap do |logger|
-      log_file = File.join(ENV["HOME"], "email-crawler.log")
-      file = File.open(log_file, File::WRONLY | File::APPEND | File::CREAT)
-      @logger = ::Logger.new(file).tap do |logger|
-        logger.level = ENV["DEBUG"] ? Logger::INFO : Logger::ERROR
-      end
-
       yield(self)
-
-      @logger.info "max_results: #{@max_results}"
-      @logger.info "max_links: #{@max_links}"
-      @logger.info "max_concurrency: #{@max_concurrency}"
     end
 
     def run(q)
       urls = Scraper.new(@google_website, @max_results).search_result_urls_for(q)
-      urls.each { |url| @logger.info "#{url}" }
+      urls.each { |url| logger.info "#{url}" }
       queue = Queue.new
       urls.each { |url| queue.push(url) }
       links_by_url = ThreadSafe::Array.new
@@ -47,8 +35,8 @@ module EmailCrawler
                 rescue ThreadError; end
 
           while url
-            @logger.info "[Thread ##{i}] grabbing page links for '#{url}'.."
-            links = PageLinks.for(url, @max_links)
+            logger.info "[Thread ##{i}] grabbing page links for '#{url}'.."
+            links = PageLinks.for(url, max_links: @max_links, logger: logger)
             links_by_url << [url, links]
 
             url = begin
@@ -58,7 +46,7 @@ module EmailCrawler
         end
       end
       threads.each(&:join)
-      @logger.debug "links_by_url: #{links_by_url.inspect}"
+      logger.debug "links_by_url: #{links_by_url.inspect}"
 
       links_by_url.each { |arr| queue.push(arr) }
       emails_by_url = ThreadSafe::Hash.new
@@ -70,8 +58,8 @@ module EmailCrawler
 
           while arr
             url, links = arr
-            @logger.info "[Thread ##{i}] scanning for emails on page '#{url}' (#{links.length} links)"
-            emails = EmailScanner.new(url).scan(links)
+            logger.info "[Thread ##{i}] scanning for emails on page '#{url}' (#{links.length} links)"
+            emails = EmailScanner.new(url, logger).scan(links)
             emails_by_url[url] = emails
 
             arr = begin
@@ -81,7 +69,7 @@ module EmailCrawler
         end
       end
       threads.each(&:join)
-      @logger.debug "emails_by_url: #{emails_by_url.inspect}"
+      logger.debug "emails_by_url: #{emails_by_url.inspect}"
 
       read_emails = Set.new
       CSV.generate do |csv|
@@ -90,13 +78,25 @@ module EmailCrawler
 
         emails_by_url.each do |url, emails_by_link|
           email_count = emails_by_link.inject(0) { |sum, arr| sum += arr.last.length }
-          @logger.info "#{url} (#{email_count} emails)"
+          logger.info "#{url} (#{email_count} emails)"
 
           emails_by_link.each do |link, emails|
             emails.each do |email|
               csv << [email, url, link] if read_emails.add?(email)
             end
           end
+        end
+      end
+    end
+
+  private
+
+    def logger
+      @logger ||= begin
+        path = File.join(ENV["HOME"], "email_crawler.log")
+        file = File.open(path, File::WRONLY | File::APPEND | File::CREAT)
+        logger = ::Logger.new(file).tap do |logger|
+          logger.level = ENV["DEBUG"] ? Logger::INFO : Logger::ERROR
         end
       end
     end

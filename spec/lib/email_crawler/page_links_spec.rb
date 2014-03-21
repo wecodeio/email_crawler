@@ -7,7 +7,7 @@ module EmailCrawler
     let(:max_links) { 25 }
 
     it "returns the first N internal links" do
-      PageLinks.for("http://www.visitberlin.de/en", max_links).length.must_equal max_links
+      PageLinks.for("http://www.visitberlin.de/en", max_links: max_links).length.must_equal max_links
     end
   end
 end

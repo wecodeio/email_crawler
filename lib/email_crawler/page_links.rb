@@ -6,7 +6,7 @@ module EmailCrawler
 
     include MechanizeHelper
 
-    def initialize(url)
+    def initialize(url, logger = Logger.new("/dev/null"))
       @url = url
       uri = URI(url)
       scheme_and_host = if uri.host
@@ -15,13 +15,11 @@ module EmailCrawler
                           url[%r(\A(https?://([^/]+))), 1]
                         end
       @domain = Regexp.new("#{scheme_and_host}/", true)
-      @logger = ::Logger.new(STDOUT).tap do |logger|
-        logger.level = ENV["DEBUG"] ? Logger::INFO : Logger::ERROR
-      end
+      @logger = logger
     end
 
-    def self.for(url, max_links = MAX_LINKS)
-      new(url).fetch_links(max_links)
+    def self.for(url, max_links: MAX_LINKS, logger: Logger.new("/dev/null"))
+      new(url, logger).fetch_links(max_links)
     end
 
     def fetch_links(max_links = MAX_LINKS)

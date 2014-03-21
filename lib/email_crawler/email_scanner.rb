@@ -6,11 +6,8 @@ module EmailCrawler
     SLEEP_TIME = 0.5
     UTF_8 = "UTF-8".freeze
 
-    def initialize(url)
-      @url = url
-      @logger = ::Logger.new(STDOUT).tap do |logger|
-        logger.level = ENV["DEBUG"] ? Logger::INFO : Logger::ERROR
-      end
+    def initialize(url, logger = Logger.new("/dev/null"))
+      @url, @logger = url, logger
     end
 
     def scan(links)
