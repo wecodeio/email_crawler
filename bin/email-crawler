@@ -12,6 +12,7 @@ class OptionsParser
     options.max_results = ::EmailCrawler::Scraper::MAX_RESULTS
     options.max_links = ::EmailCrawler::PageLinks::MAX_LINKS
     options.max_concurrency = ::EmailCrawler::Runner::MAX_CONCURRENCY
+    options.blacklisted_domains = []
 
     opt_parser = OptionParser.new do |opts|
       opts.banner = "Usage: email-crawler [options]"
@@ -45,6 +46,11 @@ class OptionsParser
               "  (defaults to 10)") do |max_concurrency|
         options.max_concurrency = max_concurrency.to_i
       end
+
+      opts.on("-b", "--blacklist DOMAIN",
+              "Blacklist URLs under this domain from Google's search results") do |domain|
+        options.blacklisted_domains << domain
+      end
     end
 
     opt_parser.parse!(args)
@@ -61,6 +67,7 @@ else
     runner.max_results = options.max_results
     runner.max_links = options.max_links
     runner.max_concurrency = options.max_concurrency
+    runner.blacklisted_domains = options.blacklisted_domains
   end
   csv = runner.run(options.q)
   $stdout << "#{csv}\n"

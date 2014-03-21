@@ -14,7 +14,7 @@ module EmailCrawler
   class Runner
     MAX_CONCURRENCY = 50
 
-    attr_writer :max_results, :max_links, :max_concurrency, :logger
+    attr_writer :max_results, :max_links, :max_concurrency, :logger, :blacklisted_domains
 
     def initialize(google_website)
       @google_website = google_website
@@ -22,7 +22,10 @@ module EmailCrawler
     end
 
     def run(q)
-      urls = Scraper.new(@google_website, max_results: @max_results).search_result_urls_for(q)
+      urls = Scraper.new(@google_website,
+                         max_results: @max_results,
+                         blacklisted_domains: @blacklisted_domains).
+                     search_result_urls_for(q)
       urls.each { |url| logger.info "#{url}" }
       queue = Queue.new
       urls.each { |url| queue.push(url) }
