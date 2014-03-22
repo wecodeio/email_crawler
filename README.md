@@ -1,6 +1,6 @@
 # EmailCrawler
 
-Email crawler: crawls the top ten Google search results looking for email addresses and exports them to CSV.
+Email crawler: crawls the top N Google search results looking for email addresses and exports them to CSV.
 
 ## Installation
 
