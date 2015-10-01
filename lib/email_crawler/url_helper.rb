@@ -11,6 +11,7 @@ module URLHelper
             return
           end
     host = uri.host || url[DOMAIN_REGEXP, 1].to_s
+
     if www || host !~ WWW_REGEXP
       host.downcase
     else

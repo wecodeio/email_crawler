@@ -4,9 +4,9 @@ require File.expand_path("lib/email_crawler")
 
 module EmailCrawler
   describe EmailScanner do
-    subject { EmailScanner.new("google.com") }
+    subject { EmailScanner.new }
 
-    let(:link) { "http://www.kitaylaw.com/contact.php" }
+    let(:link) { "https://www.mrosupply.com/page/plain/contact-us/" }
 
     it "scans links for email addresses" do
       emails_by_link = subject.scan([link])

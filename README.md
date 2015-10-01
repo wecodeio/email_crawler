@@ -44,6 +44,12 @@ email-crawler --query "berlin walks" --max-links 250
 email-crawler --query "berlin walks" --concurrency 25
 ```
 
+* Exclude certain domains from pages scanned for email addresses
+
+```bash
+email-crawler --query "berlin walks" --blacklist berlin.de --blacklist berlin.com
+```
+
 * Redirect output to a file
 
 ```bash

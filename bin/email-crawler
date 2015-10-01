@@ -70,5 +70,5 @@ else
     runner.blacklisted_domains = options.blacklisted_domains
   end
   csv = runner.run(options.q)
-  $stdout << "#{csv}\n"
+  STDOUT << "#{csv}\n"
 end

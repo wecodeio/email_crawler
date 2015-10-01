@@ -6,7 +6,7 @@ module EmailCrawler
 
     def new_agent
       Thread.current[:agent] ||= Mechanize.new do |agent|
-        agent.user_agent_alias = "Mac Safari"
+        agent.user_agent_alias = "Windows Mozilla"
         agent.open_timeout = agent.read_timeout = READ_TIMEOUT
         agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
         agent.history.max_size = 1

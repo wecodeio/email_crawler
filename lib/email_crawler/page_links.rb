@@ -73,7 +73,7 @@ module EmailCrawler
       links.to_a
     end
 
-  private
+    private
 
     def agent
       @agent ||= new_agent
