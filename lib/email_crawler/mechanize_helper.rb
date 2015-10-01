@@ -37,5 +37,11 @@ module EmailCrawler
         end
       end
     end
+
+    private
+
+    def agent
+      @agent ||= new_agent
+    end
   end
 end

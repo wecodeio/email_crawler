@@ -1,9 +1,9 @@
-require "open-uri"
-
 module EmailCrawler
   class EmailScanner
     EMAIL_REGEXP = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}\b/i
     UTF_8 = "UTF-8".freeze
+
+    include MechanizeHelper
 
     def initialize(logger = Logger.new("/dev/null"))
       @logger = logger
@@ -14,17 +14,12 @@ module EmailCrawler
         @logger.info "searching for emails on '#{link}'.."
         retried = false
 
-        html = begin
-                 open(link).read
-               rescue OpenURI::HTTPError => err
-                 @logger.warn(err)
-                 nil
-               rescue => err
-                 if err.message =~ /redirection forbidden/
-                   link = err.message.split(" ").last
-                   retry
-                 end
-               end
+        begin
+          html = get(link).body
+        rescue => err
+          @logger.warn err.inspect
+          nil
+        end
         next unless html
 
         begin

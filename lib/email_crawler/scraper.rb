@@ -58,9 +58,5 @@ module EmailCrawler
 
       urls
     end
-
-    def agent
-      @agent ||= new_agent
-    end
   end
 end

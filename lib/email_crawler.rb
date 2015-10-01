@@ -31,7 +31,7 @@ module EmailCrawler
       urls.each { |url| queue.push(url) }
       links_by_url = ThreadSafe::Array.new
 
-      threads = (1..[urls.length, @max_concurrency].min).map do |i|
+      threads = (1..[queue.size, @max_concurrency].min).map do |i|
         Thread.new(i) do |i|
           url = begin
                   queue.pop(true)

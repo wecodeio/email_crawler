@@ -8,8 +8,10 @@ module EmailCrawler
 
     def initialize(url, logger = Logger.new("/dev/null"))
       @url = url
-      uri = URI(url)
-      scheme_and_host = if uri.host
+      uri = begin
+              URI(url)
+            rescue; end
+      scheme_and_host = if uri && uri.host
                           "#{uri.scheme}://#{uri.host}"
                         else
                           url[%r(\A(https?://([^/]+))), 1]
@@ -47,7 +49,7 @@ module EmailCrawler
             @logger.error "Giving up grabbing link for '#{@url}' after #{retries} retries"
             break
           end
-        rescue URI::InvalidComponentError => err
+        rescue => err
           @logger.warn err.inspect
         else
           retries = 0
@@ -71,12 +73,6 @@ module EmailCrawler
       end
 
       links.to_a
-    end
-
-    private
-
-    def agent
-      @agent ||= new_agent
     end
   end
 end
